@@ -7,8 +7,9 @@ var Server = require('./server.js').Server,
 var snakes = {};
 var bonuses = [];
 
+var port = process.env.PORT || 5000;
 var server = new Server({
-    port: 5000,
+    port: port,
     snakes: snakes,
     bonuses: bonuses
 });

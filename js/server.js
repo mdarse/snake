@@ -78,6 +78,6 @@ Server.prototype.updateScoreBoard = function() {
     players = _(players).sortBy(function(player) {
         return -player.score;
     });
-    
+
     this.socket.of('/snake').emit('scoreboard:update', players);
 };
