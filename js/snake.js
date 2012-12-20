@@ -4,20 +4,22 @@ exports.Snake = Snake = function(playerId) {
     this.STAGE_HEIGHT = 50;
 
     this.playerId = playerId;
-    this.initialize();
-};
-
-Snake.prototype.initialize = function() {
-    
     this.kills = 0;
     this.deaths = 0;
+    this.score = 0;
 
     this.reset();
 };
 
-Snake.prototype.die = function() {
+Snake.prototype.onDie = function() {
     this.deaths++;
     this.reset();
+};
+
+Snake.prototype.onKill = function() {
+    this.kills++;
+    // Get points on kill !!
+    this.score += 42;
 };
 
 Snake.prototype.reset = function() {
@@ -30,18 +32,37 @@ Snake.prototype.reset = function() {
     }
     this.head = this.elements[0];
     this.tail = this.elements[this.elements.length -1];
+
+    // Reset score
+    this.score = 0;
 };
 
 Snake.prototype.grow = function() {
-    console.log('Snake::grow');
+    // Move elements after tail, (head & other elements) as head is not the first element
+    var elements = this.elements,
+        moveFrom = elements.indexOf(this.tail),
+        lastIndex = elements.length - 1;
 
-    
+    if (moveFrom !== lastIndex) { // If not last item
+        for (var i = lastIndex; i > moveFrom; i--) {
+            elements[i + 1] = elements[i];
+            // elements[i] = null;
+        }
+    }
+    this.tail = elements[moveFrom + 1] = { x: this.lastTailX, y: this.lastTailY };
+
+    // Update score
+    this.score += 27;
 };
 
 Snake.prototype.step = function() {
     this.direction = this.nextDirection;
     
     var newTail = this.findNewTail(this.tail);
+
+    // Backup old tail coordinates in case of growth
+    this.lastTailX = this.tail.x;
+    this.lastTailY = this.tail.y;
 
     // Move tail to new head position
     this.tail.x = (this.head.x + this.dx[this.direction] + this.STAGE_HEIGHT) % this.STAGE_HEIGHT;
@@ -53,9 +74,10 @@ Snake.prototype.step = function() {
 };
 
 Snake.prototype.findNewTail = function(currentTail) {
-    var currentTailIndex = this.elements.indexOf(currentTail);
-    var tailIndex = (currentTailIndex + this.SNAKE_LENGTH -1) % this.SNAKE_LENGTH;
-    return this.elements[tailIndex];
+    var elements = this.elements,
+        currentTailIndex = elements.indexOf(currentTail);
+    var tailIndex = (currentTailIndex + elements.length - 1) % elements.length;
+    return elements[tailIndex];
 };
 
 Snake.prototype.directions = ['right', 'left', 'up', 'down'];
@@ -84,19 +106,21 @@ Snake.prototype.setDirection = function(direction) {
     this.nextDirection = direction;
 };
 
-Snake.prototype.collideWith = function(other) {
-    return (this.head.x === other.x && this.head.y === other.y);
+Snake.prototype.collideWith = function(bonus) {
+    return (this.head.x === bonus.x && this.head.y === bonus.y);
 };
 
 Snake.prototype.collideWithSelf = function() {
-    var elements = this.elements;
+    return this.collideWithSnake(this);
+};
+
+Snake.prototype.collideWithSnake = function(other) {
+    var head = this.head;
+    var elements = other.elements;
     for (var i = 0, l = elements.length; i < l; i++) {
-        var elementA = elements[i];
-        for (var j = 0; j < l; j++) {
-            var elementB = elements[j];
-            if (elementA !== elementB && elementA.x === elementB.x && elementA.y === elementB.y)
-                return true;
-        }
+        var element = elements[i];
+        if (head !== element && head.x === element.x && head.y === element.y)
+            return true;
     }
     return false;
 };

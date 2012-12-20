@@ -2,8 +2,7 @@
 
     var $stage,
         context,
-        $kills,
-        $deaths,
+        $scoreboard,
         server,
         snakeId,
         STAGE_WIDTH  = 50,
@@ -15,13 +14,16 @@
         server = io.connect('http://localhost:5000/snake');
 
         server.on('response', function(data) {
-            console.log('Snake id response : ' + data.snakeId);
             snakeId = data.snakeId;
         });
 
         server.on('update', function(data) {
             renderSnakes(data.snakes);
             renderBonuses(data.bonuses);
+        });
+
+        server.on('scoreboard:update', function(players) {
+            renderScoreboard(players);
         });
     }
 
@@ -39,28 +41,25 @@
                 case 39: // Right
                     direction = 'right';
                     break;
-                case 40: // Bottom
+                case 40: // Down
                     direction = 'down';
                     break;
                 default:
                     return;
             }
             e.preventDefault();
-            server.emit('Snake.requestDirection', direction);
+            server.emit('player:direction:request', direction);
         });
     }
 
     function renderSnakes(snakes) {
-        context.clearRect(0, 0, BLOCK_WIDTH*STAGE_WIDTH - 1, BLOCK_HEIGHT*STAGE_HEIGHT - 1);
+        // context.clearRect(0, 0, BLOCK_WIDTH*STAGE_WIDTH - 1, BLOCK_HEIGHT*STAGE_HEIGHT - 1);
+        renderGrid();
 
         for (var i in snakes) {
             var snake = snakes[i];
             var elements = snake.elements;
             if (snake.playerId === snakeId) {
-                // update HUD
-                $kills.html(snake.kills);
-                $deaths.html(snake.deaths);
-
                 context.fillStyle = '#3b59a9';
             } else {
                 context.fillStyle = 'rgba(255, 43, 0, 0.8)';
@@ -68,7 +67,7 @@
             for (var j = 0, l = elements.length; j < l; j++) {
                 var x = elements[j].x * BLOCK_WIDTH,
                     y = elements[j].y * BLOCK_HEIGHT;
-                    // alpha = (jj*l)/100+0.4;
+                    // alpha = (jj*l)/100+0.1;
 
                 // context.fillStyle = 'rgba(0, 0, 0, ' + alpha + ')';
                 context.fillRect(x, y, BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
@@ -84,13 +83,44 @@
             context.fillRect(x, y, BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
         });
     }
+
+    function renderGrid() {
+        context.fillStyle = '#eee';
+        for (var x = 0; x < STAGE_WIDTH; x++) {
+            for (var y = 0; y < STAGE_HEIGHT; y++) {
+                context.fillRect(x * BLOCK_WIDTH, y * BLOCK_HEIGHT,BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
+            }
+        }
+    }
+
+    function renderScoreboard(players) {
+        // Emty and render each player
+        $scoreboard.empty();
+        players.forEach(function(player) {
+            $scoreboard.append(makeScoreboardRow(player));
+        });
+    }
+
+    function makeScoreboardRow(player) {
+        // Display only 2 decimals, keeping original value if NaN
+        var ratio = typeof(player.ratio) === 'number' ?
+            player.ratio.toFixed(2) :
+            player.ratio;
+        return '<tr>' +
+            '<td>' + player.name   + '</td>' +
+            '<td>' + player.kills  + '</td>' +
+            '<td>' + player.deaths + '</td>' +
+            '<td>' + ratio         + '</td>' +
+            '<td>' + player.score  + '</td>' +
+            '</tr>';
+    }
     
     $(document).ready(function() {
         $stage = $('#stage');
         context = $stage.get(0).getContext('2d');
-        $kills = $('#kills > span');
-        $deaths = $('#deaths > span');
+        $scoreboard = $('#scoreboard > tbody');
 
+        // Bootstrap app
         connect();
         listenKeys();
     });

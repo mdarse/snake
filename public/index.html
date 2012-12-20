@@ -6,34 +6,56 @@
         <link href='http://fonts.googleapis.com/css?family=Grand+Hotel' rel='stylesheet' type='text/css'>
         <style>
             body {
+                width: 940px;
+                margin-left: auto;
+                margin-right: auto;
+
                 font-family: "Grand Hotel";
                 color: #3b59a9;
                 text-align: center;
             }
             h1 {
-                width: 12em;
-                margin-left: auto;
-                margin-right: auto;
                 background-color: #3b59a9;
                 color: white;
                 font-weight: normal;
             }
-            canvas {
-                border: 1px solid #ccc;
+            div.sideboard {
+                width: 420px;
+                height: 500px;
+                margin-right: 20px;
+                background-color: #efefef;
+            }
+            div.sideboard,
+            #stage {
+                float: left;
+            }
+            #scoreboard {
+                width: 80%;
+                margin: 0 10%;
             }
         </style>
     </head>
     <body>
-        <h1>WebSocket Snake Experiment</h1>
-        <div id="scoreboard">
-            <span id="kills">Kills: <span>0</span></span>
-            <span id="goodies">Goodies: <span>0</span></span>
-            <span id="deaths">Deaths: <span>0</span></span>
-            <span id="score">Score: <span>0</span></span>
+        <div class="sideboard">
+            <h1>WebSocket Snake Experiment</h1>
+            <table id="scoreboard">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Kills</th>
+                        <th>Deaths</th>
+                        <th>Ratio</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
+
         <canvas id="stage" width="500" height="500">
             Canvas not supported.
         </canvas>
+
         <script src="js/jquery.min.js"></script>
         <script src="http://localhost:5000/socket.io/socket.io.js"></script>
         <script src="js/client.js"></script>

@@ -1,0 +1,12 @@
+{
+  "name" : "snake-experiment",
+  "description" : "Multiplayer snake using WebSocket.",
+  "homepage" : "http://github.com/mdarse/snake",
+  "keywords" : [],
+  "author" : "Mathieu Darse <contact@mathieudarse.fr>",
+  "contributors" : [],
+  "dependencies" : ["express", "socket.io", "underscore"],
+  "repository" : {"type": "git", "url": "git://github.com/mdarse/snake.git"},
+  "main" : "js/app.js",
+  "version" : "0.0.1"
+}

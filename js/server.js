@@ -1,7 +1,8 @@
 var express = require('express'),
     EventEmitter = require('events').EventEmitter,
     http = require('http'),
-    io = require('socket.io');
+    io = require('socket.io'),
+    _ = require('underscore');
 
 exports.Server = Server = function(options) {
     this.clientId = 1;
@@ -39,22 +40,17 @@ Server.prototype.setupSockets = function() {
     }.bind(this));
 
     this.socket.of('/snake').on('connection', function(client) {
-        client.snakeId = this.clientId;
-        this.clientId++;
+        client.snakeId = this.clientId++;
 
         client.emit('response', { snakeId: client.snakeId });
-        this.em.emit('Server.newSnake', client.snakeId);
-        console.log('Client connected with ID ' + client.snakeId);
+        this.em.emit('player:connect', client.snakeId);
 
-        client.on('Snake.requestDirection', function(direction) {
-            this.em.emit('Snake.changeDirection', {
-                id: client.snakeId,
-                direction: direction
-            });
+        client.on('player:direction:request', function(direction) {
+            this.em.emit('player:direction:change', client.snakeId, direction);
         }.bind(this));
 
         client.on('disconnect', function() {
-            this.em.emit('Snake.disconnect', client.snakeId);
+            this.em.emit('player:disconnect', client.snakeId);
         }.bind(this));
 
     }.bind(this));
@@ -65,4 +61,23 @@ Server.prototype.update = function() {
         snakes: this.snakes,
         bonuses: this.bonuses
     });
+};
+
+Server.prototype.updateScoreBoard = function() {
+    var players = _(this.snakes).map(function(item) {
+        var ratio = item.deaths === 0 ? '∞' : item.kills / item.deaths;
+        return {
+            name:   item.playerId,
+            kills:  item.kills,
+            deaths: item.deaths,
+            score:  item.score,
+            ratio:  ratio
+        };
+    });
+    // Sort by score descending
+    players = _(players).sortBy(function(player) {
+        return -player.score;
+    });
+    
+    this.socket.of('/snake').emit('scoreboard:update', players);
 };
