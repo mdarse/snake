@@ -25,6 +25,9 @@ server.em.addListener('player:connect', function(playerId) {
 server.em.addListener('player:disconnect', function(playerId) {
     console.log('Player #' + playerId + ' disconnected');
     delete snakes[playerId];
+
+    // Update scores
+    server.updateScoreBoard();
 });
 server.em.addListener('player:direction:change', function(playerId, direction) {
     snakes[playerId].setDirection(direction);
