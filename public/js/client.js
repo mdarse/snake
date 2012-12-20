@@ -11,7 +11,7 @@
         BLOCK_HEIGHT = 10;
 
     function connect() {
-        server = io.connect('http://localhost:5000/snake');
+        server = io.connect(document.location.origin + '/snake');
 
         server.on('response', function(data) {
             snakeId = data.snakeId;
