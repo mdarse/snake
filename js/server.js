@@ -37,19 +37,14 @@ Server.prototype.setupSockets = function() {
 
     this.socket.configure(function() {
         this.socket.set('log level', 1);
-        // Heroku long polling trick
-        this.socket.set("transports", ["xhr-polling"]);
-        this.socket.set("polling duration", 10);
     }.bind(this));
 
-    // New connection event handler
     this.socket.of('/snake').on('connection', function(client) {
         client.snakeId = this.clientId++;
 
         client.emit('response', { snakeId: client.snakeId });
         this.em.emit('player:connect', client.snakeId);
 
-        // Once connected we can bind all client events
         client.on('player:direction:request', function(direction) {
             this.em.emit('player:direction:change', client.snakeId, direction);
         }.bind(this));
