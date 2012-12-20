@@ -1,7 +1,6 @@
 var Server = require('./server.js').Server,
     Snake = require('./snake.js').Snake,
     Bonus = require('./bonus.js').Bonus,
-    io = require('socket.io'),
     _ = require('underscore');
 
 var snakes = {};
