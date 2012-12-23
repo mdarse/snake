@@ -7,7 +7,12 @@ var Server = require('./server.js').Server,
 
 var snakes = {};
 var bonuses = [];
+
+// Portals
 var portals = [];
+// Portal gives the ability to teleport from one place to another
+// you just need to enter by the entry portal and you will teleport
+// Warning: Wrond way will kill your snake.
 
 var port = process.env.PORT || 5000;
 var server = new Server({
