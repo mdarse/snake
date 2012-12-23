@@ -8,6 +8,7 @@ exports.Server = Server = function(options) {
     this.clientId = 1;
     this.snakes = options.snakes;
     this.bonuses = options.bonuses;
+    this.portals = options.portals;
 
     this.options = options;
     this.initialize(options);
@@ -59,7 +60,8 @@ Server.prototype.setupSockets = function() {
 Server.prototype.update = function() {
     this.socket.of('/snake').emit('update', {
         snakes: this.snakes,
-        bonuses: this.bonuses
+        bonuses: this.bonuses,
+        portals: this.portals
     });
 };
 

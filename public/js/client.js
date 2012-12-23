@@ -20,6 +20,7 @@
         server.on('update', function(data) {
             renderSnakes(data.snakes);
             renderBonuses(data.bonuses);
+            renderPortals(data.portals);
         });
 
         server.on('scoreboard:update', function(players) {
@@ -81,6 +82,21 @@
             var x = bonus.x * BLOCK_WIDTH,
                 y = bonus.y * BLOCK_HEIGHT;
             context.fillRect(x, y, BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
+        });
+    }
+
+    function renderPortals(portals) {
+        portals.forEach(function(portal) {
+            // input
+            context.fillStyle = 'rgb(80, 192, 238)';
+            var inX = portal.input.x * BLOCK_WIDTH,
+                inY = portal.input.y * BLOCK_HEIGHT;
+            context.fillRect(inX, inY, BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
+            // output
+            context.fillStyle = 'rgb(236, 93, 48)';
+            var outX = portal.output.x * BLOCK_WIDTH,
+                outY = portal.output.y * BLOCK_HEIGHT;
+            context.fillRect(outX, outY, BLOCK_WIDTH -1, BLOCK_HEIGHT -1);
         });
     }
 

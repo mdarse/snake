@@ -124,3 +124,9 @@ Snake.prototype.collideWithSnake = function(other) {
     }
     return false;
 };
+
+Snake.prototype.teleportTo = function(target) {
+    console.log(target);
+    this.head.x = target.x;
+    this.head.y = target.y;
+};

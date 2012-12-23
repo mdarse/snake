@@ -1,17 +1,20 @@
 var Server = require('./server.js').Server,
     Snake = require('./snake.js').Snake,
     Bonus = require('./bonus.js').Bonus,
+    Portal = require('./portal.js').Portal,
     io = require('socket.io'),
     _ = require('underscore');
 
 var snakes = {};
 var bonuses = [];
+var portals = [];
 
 var port = process.env.PORT || 5000;
 var server = new Server({
     port: port,
     snakes: snakes,
-    bonuses: bonuses
+    bonuses: bonuses,
+    portals: portals
 });
 
 // Event process
@@ -40,6 +43,8 @@ server.em.addListener('player:direction:change', function(playerId, direction) {
         bonuses.push(new Bonus());
     }
 })();
+// Make portals
+portals.push(new Portal());
 
 // Update positions & notify clients
 var update = function() {
@@ -63,6 +68,15 @@ function checkCollisions() {
                 bonuses[index] = new Bonus();
                 snake.grow();
                 scoreboardNeedUpdate = true;
+            }
+        });
+        // Portal  collision
+        _(portals).each(function(portal, index) {
+            if (snake.collideWith(portal.input)) {
+                snake.teleportTo(portal.output);
+            }
+            else if (snake.collideWith(portal.output)) {
+                deads.push(snake);
             }
         });
         // Self collision
